@@ -1,6 +1,8 @@
 # sin los data model orion permite cualquier cosa al definir el modelo, por ejemplo en geo:json point un string
 # al igual que antes las relaciones es un convencionalismo, en realidad puedes ponerlo a algo que no exista como la shelf 5 que esta con store 3
 # es no relacional, al borrar debes borrar tambien las relaicones de la entidad que borras para no ser inconsistente
+# las operaciones del crud verlo en la documentacion, son todas llamadas con curl
+# buscar en la documentacion de ngsi-v2 como hacer un delete en cascada
 echo 'Get Version'
 echo '============='
 curl -X GET \
@@ -328,4 +330,6 @@ curl -G -X GET \
   -d 'options=count' \
   -d 'attrs=type' \
   | json_pp
+
+
   
