@@ -49,7 +49,25 @@ services:
     command: --bind_ip_all --smallfiles #se pueden conectar por cualquier ip de la maquina no solo desde localhost
     volumes:
       - mongo-db-tutorial:/data
-
+  
+  # Web Client
+  web-client:
+    build:
+      context: ./web-client
+    hostname: web-client
+    container_name: web-client-tutorial
+    depends_on:
+      - orion
+    expose: 
+      - "${WEB_CLIENT_PORT}"
+    ports:
+      - "${WEB_CLIENT_PORT}:${WEB_CLIENT_PORT}"
+    networks:
+      - fiware
+    environment:
+      - "WEB_CLIENT_PORT=${WEB_CLIENT_PORT}"
+      - "CONTEXT_BROKER=${CONTEXT_BROKER}"
+      - "NGSI_VERSION=${NGSI_VERSION}"
 networks:
   fiware:
     ipam:

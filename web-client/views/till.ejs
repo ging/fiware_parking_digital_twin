@@ -1,0 +1,15 @@
+<h1><%=storeId%></h1>
+<ul>
+    <% inventory.forEach(item => {
+        const product = products.find(product => item.refProduct === product.id);
+        if (product) {
+    %>
+            <li>
+                <form method='post' action='/app/inventory/<%=item.id%>'>
+                    <%=product.name%>: <%=item.shelfCount%> elementos
+                    <input type='submit' value='Comprar'>
+                </form>
+            </li>
+        <% }
+     }) %>
+</ul>

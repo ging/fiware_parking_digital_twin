@@ -15,7 +15,7 @@ echo ''
 echo 'Creating store entities'
 echo '============='
 curl -iX POST \
-  'http://localhost:1026/v2//op/update' \
+  'http://localhost:1026/v2/op/update' \
   -H 'Content-Type: application/json' \
   -d '{
   "actionType": "append",
