@@ -7,6 +7,7 @@ It has the following tutorials:
 	- Relationships
 	- Crud operations
 	- Accesing context
+	- Subscriptions
 
 
 Para iniciar:
@@ -18,3 +19,8 @@ docker-compose up -d --build
 ```
 
 Open http://localhost:3000/
+
+To watch the subscription events:
+```shell
+docker logs web-client-tutorial
+```

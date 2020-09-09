@@ -11,4 +11,11 @@ router.get("/app/store/:storeId/till", Store.displayTillInfo);
 // Buy something.
 router.post("/app/inventory/:inventoryId", Store.buyItem);
 
+// Whenever a subscription is received, print it
+// Answer orion with 204
+router.post("/subscription/:type", (req, res) => {
+  console.warn("Subscription event ", req.params.type, req.body.data);
+  res.status(204).send();
+});
+
 module.exports = router;

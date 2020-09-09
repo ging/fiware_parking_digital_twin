@@ -9,8 +9,7 @@ curl -X GET \
   'http://localhost:1026/version' \
   | json_pp
 
-echo ''
-echo ''
+printf '\n\n'
 
 echo 'Creating store entities'
 echo '============='
@@ -71,8 +70,7 @@ curl -iX POST \
   ]
 }'
 
-echo ''
-echo ''
+printf '\n\n'
 
 echo 'Creating shelf entities'
 echo '============='
@@ -145,8 +143,7 @@ curl -iX POST \
   ]
 }'
 
-echo ''
-echo ''
+printf '\n\n'
 
 echo 'Creating product entities'
 echo '============='
@@ -207,8 +204,7 @@ curl -iX POST \
   ]
 }'
 
-echo ''
-echo ''
+printf '\n\n'
 
 echo 'Creating relationships 1 to N'
 echo '============='
@@ -256,8 +252,7 @@ curl -iX POST \
   ]
 }'
 
-echo ''
-echo ''
+printf '\n\n'
 echo 'Get shelfs from store 001'
 echo '============='
 curl -G -X GET \
@@ -267,8 +262,7 @@ curl -G -X GET \
   -d 'attrs=type' \
   -d 'type=Shelf'
 
-echo ''
-echo ''
+printf '\n\n'
 echo 'Get shelfs from store 003 that not exists'
 echo '============='
 curl -G -X GET \
@@ -279,8 +273,7 @@ curl -G -X GET \
   -d 'type=Shelf'
 
 
-echo ''
-echo ''
+printf '\n\n'
 echo 'N to N to N  relationship between store, shelf and product crating a new entity'
 curl -iX POST \
   'http://localhost:1026/v2/entities' \
@@ -309,8 +302,7 @@ curl -iX POST \
     }
 }'
 
-echo ''
-echo ''
+printf '\n\n'
 echo 'Get store where is product 001'
 echo '============='
 curl -G -X GET \
@@ -320,8 +312,7 @@ curl -G -X GET \
   -d 'attrs=refStore'\
   -d 'type=InventoryItem'
 
-echo ''
-echo ''
+printf '\n\n'
 echo 'Get all relations where store 001 appears. If you want to delete store 001 delete its relationships too.'
 echo '============='
 curl -G -X GET \
@@ -330,6 +321,28 @@ curl -G -X GET \
   -d 'options=count' \
   -d 'attrs=type' \
   | json_pp
+
+printf '\n\n'
+echo 'Subscribe to changes in inventory'
+# The notification can be done to any url, but now to the web-client service (docker must be initiated in web-client)
+# The log of the event is in the web-client (docker logs web-client-tutorial)
+curl -iX POST \
+  --url 'http://localhost:1026/v2/subscriptions' \
+  --header 'content-type: application/json' \
+  --data '{
+  "description": "Notify me of all inventory changes",
+  "subject": {
+    "entities": [{"idPattern": ".*", "type": "InventoryItem"}],
+    "condition": {
+      "attrs": [ "shelfCount" ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://web-client:3000/subscription/inventory-change"
+    }
+  }
+}'
 
 
   
