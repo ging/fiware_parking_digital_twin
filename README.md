@@ -10,9 +10,31 @@ It has the following tutorials:
 	- Subscriptions
 
 - Identity Management:
+    - Administrating Users
 
+Entities:
 
-Para iniciar:
+- User - Any signed up user able to identify themselves with an eMail and password. Users can be assigned rights individually or as a group
+- Application - Any securable FIWARE application consisting of a series of microservices. The stores, there are one or more **admins**
+- Organization - A group of users who can be assigned a series of rights. Altering the rights of the organization effects the access of all users of that organization (organization of security and organizaton of managers).
+- OrganizationRole - Users can either be **members or admins (delegates of app admins)** of an organization - Admins are able to add and remove users from their organization, members merely gain the roles and permissions of an organization. This allows each organization to be responsible for their members and removes the need for a super-admin to administer all rights
+- Role - A role is a descriptive bucket for a set of permissions. A role can be assigned to either a single user or an organization. A signed-in user gains all the permissions from all of their own roles plus all of the roles associated to their organization
+- Permission - An ability to do something on a resource within the system
+
+Users (email | password):
+
+- Admin of the system in .env (admin@test.com | test)
+- Alice, she will be the Administrator of one Keyrock Application
+- Bob (organization admin), the Regional Manager of the supermarket chain - he has several store managers under him:
+    - Manager1
+    - Manager2
+- Charlie (organization admin), the Head of Security of the supermarket chain - he has several store detectives under him:
+    - Detective1
+    - Detective2
+
+**Note** - an eMail server must be configured to send out invites properly, otherwise the invitation may be deleted as spam. For testing purposes, it is easier to update the users table directly: `mysql -u <user> -p<password> idm` and `update user set enabled = 1;` Or you can use a real account but search in spam section.
+
+To start:
 
 ```shell
 docker-compose up -d --build

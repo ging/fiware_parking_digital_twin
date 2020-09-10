@@ -34,9 +34,10 @@ services:
     healthcheck:
       test: curl --fail -s http://orion:${ORION_PORT}/version || exit 1
 
-
   # Databases
+    # For orion
   mongo-db:
+    restart: always
     image: mongo:${MONGO_DB_VERSION}
     hostname: mongo-db
     container_name: db-mongo-tutorial
@@ -49,7 +50,24 @@ services:
     command: --bind_ip_all --smallfiles #se pueden conectar por cualquier ip de la maquina no solo desde localhost
     volumes:
       - mongo-db-tutorial:/data
-  
+    # For keyrock
+  mysql-db:
+    restart: always
+    image: mysql:${MYSQL_DB_VERSION}
+    hostname: mysql-db
+    container_name: db-mysql-tutorial
+    expose:
+        - "${MYSQL_DB_PORT}"
+    ports:
+        - "${MYSQL_DB_PORT}:${MYSQL_DB_PORT}"
+    networks:
+      fiware:
+        ipv4_address: 172.18.1.6
+    environment:
+        - "MYSQL_ROOT_PASSWORD=${IDM_DB_PASS}"
+        - "MYSQL_ROOT_HOST=172.18.1.5" # allow connections from this ip
+    volumes:
+        - mysql-db-tutorial:/var/lib/mysql
   # Web Client
   web-client:
     build:
@@ -68,10 +86,40 @@ services:
       - "WEB_CLIENT_PORT=${WEB_CLIENT_PORT}"
       - "CONTEXT_BROKER=${CONTEXT_BROKER}"
       - "NGSI_VERSION=${NGSI_VERSION}"
+  # keyrock
+  keyrock:
+    image: fiware/idm:${KEYROCK_VERSION}
+    container_name: fiware-keyrock-tutorial
+    hostname: keyrock
+    depends_on:
+        - mysql-db
+    ports:
+      - "${KEYROCK_PORT}:${KEYROCK_PORT}" # HTTP
+      - "${KEYROCK_HTTPS_PORT}:${KEYROCK_HTTPS_PORT}" # HTTPS
+    networks:
+      fiware:
+        ipv4_address: 172.18.1.5
+    environment:
+        - "DEBUG=idm:*"
+        - "IDM_DB_HOST=mysql-db"
+        - "IDM_DB_PASS=${IDM_DB_PASS}"
+        - "IDM_DB_USER=root"
+        - "IDM_HOST=${IDM_HOST}:${KEYROCK_PORT}"
+        - "IDM_PORT=${KEYROCK_PORT}"
+        - "IDM_HTTPS_ENABLED=${IDM_HTTPS_ENABLED}"
+        - "IDM_HTTPS_PORT=${KEYROCK_HTTPS_PORT}"
+        - "IDM_ADMIN_USER=${IDM_ADMIN_USER}"
+        - "IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}"
+        - "IDM_ADMIN_PASS=${IDM_ADMIN_PASS}"
+    healthcheck:
+      test: curl --fail -s http://keyrock:${KEYROCK_PORT}/version || exit 1
+    
 networks:
   fiware:
     ipam:
       config:
         - subnet: 172.18.1.0/24
+
 volumes:
   mongo-db-tutorial:
+  mysql-db-tutorial:
