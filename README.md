@@ -1,6 +1,6 @@
 # fiware_helloWorld
 
-It has the following tutorials:
+## It has the following tutorials:
 
 - Core Context Management:
 	- Getting start
@@ -11,8 +11,9 @@ It has the following tutorials:
 
 - Identity Management:
     - Administrating Users
+    - Managing Roles and Permissions
 
-Entities:
+### Entities IDM:
 
 - User - Any signed up user able to identify themselves with an eMail and password. Users can be assigned rights individually or as a group
 - Application - Any securable FIWARE application consisting of a series of microservices. The stores, there are one or more **admins**
@@ -21,28 +22,39 @@ Entities:
 - Role - A role is a descriptive bucket for a set of permissions. A role can be assigned to either a single user or an organization. A signed-in user gains all the permissions from all of their own roles plus all of the roles associated to their organization
 - Permission - An ability to do something on a resource within the system
 
-Users (email | password):
+#### Users (email | password):
 
-- Admin of the system in .env (admin@test.com | test)
-- Alice, she will be the Administrator of one Keyrock Application
-- Bob (organization admin), the Regional Manager of the supermarket chain - he has several store managers under him:
-    - Manager1
-    - Manager2
-- Charlie (organization admin), the Head of Security of the supermarket chain - he has several store detectives under him:
-    - Detective1
-    - Detective2
+- Admin of the system in .env (alice-the-admin@test.com | test)
+- Alice, she will be the Administrator of one Keyrock Application (alice-the-admin@test.com | test)
+- Bob, organization admin (bob-the-manager@test.com), the Regional Manager of the supermarket chain - he has several store managers under him:
+    - Manager1 (manager1@test.com | test)
+    - Manager2 (manager1@test.com | test)
+- Charlie, organization admin (charlie-security@test.com | test), the Head of Security of the supermarket chain - he has several store detectives under him:
+    - Detective1 (detective1@test.com | test)
+    - Detective2 (detective2@test.com | test)
+- Other persons, intruses:
+    - Eve (eve@example.com | test)
+    - Mallory (mallory@example.com | test)
+    - Rob (rob@example.com | test)
 
 **Note** - an eMail server must be configured to send out invites properly, otherwise the invitation may be deleted as spam. For testing purposes, it is easier to update the users table directly: `mysql -u <user> -p<password> idm` and `update user set enabled = 1;` Or you can use a real account but search in spam section.
 
-To start:
+#### Organizations:
+- Security (alice (owner), charlie (owner), detective1, detective2)
+- Management (alice (owner), bob (owner), manager1, manager2)
+
+## To start:
 
 ```shell
-docker-compose up -d --build
+# remove volume to charge the backup.sql
+docker-compose -p fiware-tutorial down --volume --remove-orphans
+docker-compose -p fiware-tutorial up -d --build
 # create entities, subscriptions, etc.
 ./scripts/first.sh
 ```
 
 Open http://localhost:3000/
+Open http://localhost:3005/ (idm)
 
 To watch the subscription events:
 ```shell

@@ -68,6 +68,7 @@ services:
         - "MYSQL_ROOT_HOST=172.18.1.5" # allow connections from this ip
     volumes:
         - mysql-db-tutorial:/var/lib/mysql
+        - ./mysql-data:/docker-entrypoint-initdb.d/:ro # Preload Keyrock Roles
   # Web Client
   web-client:
     build:
