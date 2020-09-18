@@ -8,7 +8,9 @@
     "node": ">=8.6"
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "body-parser": "^1.18.3",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
     "ejs": "^3.1.5",
@@ -27,6 +29,7 @@
     "pug": "2.0.3",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
+    "simple-oauth2": "^4.1.0",
     "socket.io": "^2.1.1",
     "twitter": "^1.7.1",
     "xml-parser": "^1.2.1",

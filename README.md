@@ -12,6 +12,8 @@
 - Identity Management:
     - Administrating Users
     - Managing Roles and Permissions
+    - Securing Access (with authorization code grant type). **Importante: A partir de aquí no va a funcionar el web-tutorial como un contenedor porque hay un problema con el paquete de oauth. Necesitas dos ips para identificar a keyrock, una para comunicarse desde el host y otra desde el contenedor, pero el paquete solo deja una. En producción no habría este problema ya que te conectarías a la ip pública de keyrock o del proxy. Por lo tanto arranca web tutorial en la propia máquina. Otra solución sería probar el network host, pero sólo válido en linux**
+
 
 ### Entities IDM:
 
@@ -42,6 +44,14 @@
 #### Organizations:
 - Security (alice (owner), charlie (owner), detective1, detective2)
 - Management (alice (owner), bob (owner), manager1, manager2)
+
+#### Applications:
+- There is an app with roles and permissions. With URL `http://localhost:3000`; redirectURL `http://localhost:3000/login`; redirectSOURL `http://localhost:3000/logout` and clientID `tutorial-dckr-site-0000-xpresswebapp` and clientSecret `tutorial-dckr-site-0000-clientsecret`
+
+#### Permissions:
+- To get the list of stores **don't need** to be authenticated.
+- To get the detail of a store you **need** to be authenticated. 
+- There is **one permission created**: `POST /app/inventory/[a-zA-Z0-9:]*` assigned to the management organization of the application when buying an item.
 
 ## To start:
 

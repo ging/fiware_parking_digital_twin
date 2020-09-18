@@ -1,4 +1,35 @@
 <h1><%=title%></h1>
+<p>
+    <%if (session.username){ %>
+        <%= session.username %> <a href='/logout'>Logout</a>
+    <% } else { %>
+        <a href = '/authCodeGrant'>Login</a>
+    <% } %>
+</p>
+<% if (success.length > 0) { %>
+    <p>Éxito:</p>
+    <ul>
+    <% success.forEach(message => { %>
+        <li><%=message%></li>
+   <% }) %>
+    </ul>
+<% } %>
+<% if (info.length > 0) { %>
+    <p>Info:</p>
+    <ul>
+    <% info.forEach(message => { %>
+        <li><%=message%></li>
+   <% }) %>
+    </ul>
+<% } %>
+<% if (errors.length > 0) { %>
+    <p>Error:</p>
+    <ul>
+    <% errors.forEach(message => { %>
+        <li><%=message%></li>
+   <% }) %>
+    </ul>
+<% } %>
 <h2>Lista stores</h2>
 <ul>
     <% stores.forEach(store => { %>

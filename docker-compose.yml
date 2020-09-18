@@ -70,23 +70,25 @@ services:
         - mysql-db-tutorial:/var/lib/mysql
         - ./mysql-data:/docker-entrypoint-initdb.d/:ro # Preload Keyrock Roles
   # Web Client
-  web-client:
-    build:
-      context: ./web-client
-    hostname: web-client
-    container_name: web-client-tutorial
-    depends_on:
-      - orion
-    expose: 
-      - "${WEB_CLIENT_PORT}"
-    ports:
-      - "${WEB_CLIENT_PORT}:${WEB_CLIENT_PORT}"
-    networks:
-      - fiware
-    environment:
-      - "WEB_CLIENT_PORT=${WEB_CLIENT_PORT}"
-      - "CONTEXT_BROKER=${CONTEXT_BROKER}"
-      - "NGSI_VERSION=${NGSI_VERSION}"
+  # web-client:
+  #   build:
+  #     context: ./web-client
+  #   hostname: web-client
+  #   container_name: web-client-tutorial
+  #   depends_on:
+  #     - orion
+  #   expose: 
+  #     - "${WEB_CLIENT_PORT}"
+  #   ports:
+  #     - "${WEB_CLIENT_PORT}:${WEB_CLIENT_PORT}"
+  #   networks:
+  #     - fiware
+  #   environment:
+  #     - "WEB_CLIENT_PORT=${WEB_CLIENT_PORT}"
+  #     - "CONTEXT_BROKER=${CONTEXT_BROKER}"
+  #     - "NGSI_VERSION=${NGSI_VERSION}"
+  #     - "KEYROCK_URL=${IDM_HOST}"
+  #     - "KEYROCK_PORT=${KEYROCK_PORT}"
   # keyrock
   keyrock:
     image: fiware/idm:${KEYROCK_VERSION}

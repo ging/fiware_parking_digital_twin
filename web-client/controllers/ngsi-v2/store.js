@@ -9,7 +9,7 @@
 const NgsiV2 = require("ngsi_v2");
 const defaultClient = NgsiV2.ApiClient.instance;
 const debug = require("debug")("tutorial:ngsi-v2");
-const request = require("request");
+const axios = require("axios");
 const CB_URL = process.env.CONTEXT_BROKER || "http://localhost:1026/v2";
 
 debug("Store is retrieved using NGSI-v2");
@@ -27,26 +27,30 @@ defaultClient.basePath =
 //     'http://{{orion}}/v2/entities/?type=Store&options=keyValues'
 //
 
-function displayStores(req, res, next) {
+async function displayStores(req, res, next) {
   debug("listStores");
   const options = {
     method: "GET",
     url: `${CB_URL}/entities`,
-    qs: {
+    params: {
       type: "Store",
       options: "keyValues"
     }
   };
-  request(options, function(error, response, body) {
-    if (error) {
-      next(error);
-    } else {
-      res.render("index", {
-        title: "Prueba Stores",
-        stores: JSON.parse(body)
-      });
-    }
-  });
+  try {
+    const response = await axios(options);
+    const stores = response.data;
+    res.render("index", {
+      title: "Prueba Stores",
+      stores,
+      success: req.flash("success"),
+      errors: req.flash("error"),
+      info: req.flash("info")
+    });
+  } catch (error) {
+    debug("displaStores error", error);
+    next(error);
+  }
 }
 
 // This function receives all products and a set of inventory items
@@ -58,45 +62,46 @@ function displayStores(req, res, next) {
 //   curl -X GET \
 //     'http://{{orion}}/v2/entities/?type=InventoryItem&options=keyValues&q=refStore==<entity-id>'
 //
-function displayTillInfo(req, res, next) {
+async function displayTillInfo(req, res, next) {
   debug("displayTillInfo");
-  const options = [
-    {
-      method: "GET",
-      url: `${CB_URL}/entities`,
-      qs: {
-        type: "Product",
-        options: "keyValues"
-      }
-    },
-    {
-      method: "GET",
-      url: `${CB_URL}/entities`,
-      qs: {
-        options: "keyValues",
-        type: "InventoryItem",
-        q: "refStore==" + req.params.storeId
-      }
-    }
-  ];
-
-  request(options[0], function(error, response, bodyProducts) {
-    if (error) {
-      next(error);
-    } else {
-      request(options[1], function(error, response, bodyInventory) {
-        if (error) {
-          next(error);
-        } else {
-          res.render("till", {
-            products: JSON.parse(bodyProducts),
-            inventory: JSON.parse(bodyInventory),
-            storeId: req.params.storeId
-          });
+  if (!res.locals.authorized) {
+    req.flash("error", "Access Denied");
+    res.redirect("/");
+  } else {
+    const options = [
+      {
+        method: "GET",
+        url: `${CB_URL}/entities`,
+        params: {
+          type: "Product",
+          options: "keyValues"
         }
+      },
+      {
+        method: "GET",
+        url: `${CB_URL}/entities`,
+        params: {
+          options: "keyValues",
+          type: "InventoryItem",
+          q: "refStore==" + req.params.storeId
+        }
+      }
+    ];
+    try {
+      const productsResponse = await axios(options[0]);
+      const products = productsResponse.data;
+      const inventoryResponse = await axios(options[1]);
+      const inventory = inventoryResponse.data;
+      res.render("till", {
+        products,
+        inventory,
+        storeId: req.params.storeId
       });
+    } catch (error) {
+      debug("displaStores error", error);
+      next(error);
     }
-  });
+  }
 }
 
 // This asynchronous function retrieves and updates an inventory item from the context
@@ -114,41 +119,41 @@ function displayTillInfo(req, res, next) {
 //
 // There is no error handling on this function, it has been
 // left to a function on the router.
-function buyItem(req, res, next) {
+async function buyItem(req, res, next) {
   debug("buyItem");
-  const options = [
-    {
-      method: "GET",
-      url: `${CB_URL}/entities/${req.params.inventoryId}`,
-      qs: {
-        type: "InventoryItem",
-        options: "keyValues"
+  if (!res.locals.authorized) {
+    req.flash("error", "Access Denied");
+    res.redirect("/");
+  } else {
+    const options = [
+      {
+        method: "GET",
+        url: `${CB_URL}/entities/${req.params.inventoryId}`,
+        params: {
+          type: "InventoryItem",
+          options: "keyValues"
+        }
       }
-    }
-  ];
-  request(options[0], function(error, response, bodyInventory) {
-    if (error) {
-      next(error);
-    } else {
-      const inventory = JSON.parse(bodyInventory);
-      const count = inventory.shelfCount - 1;
+    ];
+    try {
+      const inventoryItemResponse = await axios(options[0]);
+      const inventoryItem = inventoryItemResponse.data;
+      const count = inventoryItem.shelfCount - 1;
       options.push({
         method: "PATCH",
         url: `${CB_URL}/entities/${req.params.inventoryId}/attrs`,
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ shelfCount: { type: "Integer", value: count } })
+        data: JSON.stringify({ shelfCount: { type: "Integer", value: count } })
       });
-      request(options[1], function(error) {
-        if (error) {
-          next(error);
-        } else {
-          res.redirect(`/app/store/${inventory.refStore}/till`);
-        }
-      });
+      await axios(options[1]);
+      res.redirect(`/app/store/${inventoryItem.refStore}/till`);
+    } catch (error) {
+      debug("buyItem error", error);
+      next(error);
     }
-  });
+  }
 }
 
 module.exports = {

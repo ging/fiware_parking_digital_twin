@@ -71,10 +71,10 @@ CREATE TABLE `auth_token` (
 LOCK TABLES `auth_token` WRITE;
 /*!40000 ALTER TABLE `auth_token` DISABLE KEYS */;
 INSERT INTO `auth_token` VALUES 
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','2026-07-30 12:04:45',1,'aaaaaaaa-good-0000-0000-000000000000',NULL),
-('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb','2026-07-30 12:38:13',1,'bbbbbbbb-good-0000-0000-000000000000',NULL),
-('cccccccc-cccc-cccc-cccc-cccccccccccc','2026-07-31 09:36:13',1,'cccccccc-good-0000-0000-000000000000',NULL),
-('51f2e380-c959-4dee-a0af-380f730137c3','2026-07-30 13:02:37',1,'admin',NULL);
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','2016-07-30 12:04:45',1,'aaaaaaaa-good-0000-0000-000000000000',NULL),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb','2016-07-30 12:38:13',1,'bbbbbbbb-good-0000-0000-000000000000',NULL),
+('cccccccc-cccc-cccc-cccc-cccccccccccc','2016-07-31 09:36:13',1,'cccccccc-good-0000-0000-000000000000',NULL),
+('51f2e380-c959-4dee-a0af-380f730137c3','2016-07-30 13:02:37',1,'admin',NULL);
 /*!40000 ALTER TABLE `auth_token` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,6 +102,8 @@ CREATE TABLE `authzforce` (
 
 LOCK TABLES `authzforce` WRITE;
 /*!40000 ALTER TABLE `authzforce` DISABLE KEYS */;
+INSERT INTO `authzforce` VALUES 
+('NYP5CukQEei0BgJCrBIBDA','d72f7c1c-b250-431a-82c5-c3afe65a96e8',1,'tutorial-dckr-site-0000-xpresswebapp');
 /*!40000 ALTER TABLE `authzforce` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -287,6 +289,12 @@ CREATE TABLE `oauth_client` (
 
 LOCK TABLES `oauth_client` WRITE;
 /*!40000 ALTER TABLE `oauth_client` DISABLE KEYS */;
+INSERT INTO `oauth_client` VALUES
+('tutorial-dckr-site-0000-xpresswebapp','FIWARE Tutorial',
+  'FIWARE Application protected by OAuth2 and Keyrock','tutorial-dckr-site-0000-clientsecret',
+  'http://localhost:3000','http://localhost:3000/login','http://localhost:3000/logout','default',
+  'authorization_code,implicit,password,client_credentials,refresh_token','code',NULL,NULL,NULL,'bearer', NULL);
+
 /*!40000 ALTER TABLE `oauth_client` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -443,7 +451,8 @@ INSERT INTO `permission` VALUES
 ('3','Manage roles',NULL,1,NULL,NULL,NULL,'idm_admin_app',0),
 ('4','Manage authorizations',NULL,1,NULL,NULL,NULL,'idm_admin_app',0),
 ('5','Get and assign all public application roles',NULL,1,NULL,NULL,NULL,'idm_admin_app',0),
-('6','Get and assign only public owned roles',NULL,1,NULL,NULL,NULL,'idm_admin_app',0);
+('6','Get and assign only public owned roles',NULL,1,NULL,NULL,NULL,'idm_admin_app',0),
+('buy-item-0000-0000-000000000000','Buy item','Buy an inventory item from store',0,'POST','/app/inventory/[a-zA-Z0-9:]*',NULL,'tutorial-dckr-site-0000-xpresswebapp',1);
 /*!40000 ALTER TABLE `permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -471,7 +480,10 @@ CREATE TABLE `role` (
 
 LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
-INSERT INTO `role` VALUES ('provider','Provider',1,'idm_admin_app'),('purchaser','Purchaser',1,'idm_admin_app');
+INSERT INTO `role` VALUES 
+('security-role-0000-0000-000000000000','Security Team',0,'tutorial-dckr-site-0000-xpresswebapp'),
+('managers-role-0000-0000-000000000000','Management',0,'tutorial-dckr-site-0000-xpresswebapp'),
+('provider','Provider',1,'idm_admin_app'),('purchaser','Purchaser',1,'idm_admin_app');
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -498,7 +510,7 @@ CREATE TABLE `role_assignment` (
   CONSTRAINT `role_assignment_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE,
   CONSTRAINT `role_assignment_ibfk_3` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`id`) ON DELETE CASCADE,
   CONSTRAINT `role_assignment_ibfk_4` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -507,7 +519,17 @@ CREATE TABLE `role_assignment` (
 
 LOCK TABLES `role_assignment` WRITE;
 /*!40000 ALTER TABLE `role_assignment` DISABLE KEYS */;
-INSERT INTO `role_assignment` VALUES (1,NULL,'8ca60ce9-32f9-42d6-a013-a19b3af0c13d','provider',NULL,'96154659-cb3b-4d2d-afef-18d6aec0518e'),(2,'member','8ca60ce9-32f9-42d6-a013-a19b3af0c13d','provider','74f5299e-3247-468c-affb-957cda03f0c4',NULL),(3,NULL,'222eda27-958b-4f0c-a5cb-e4114fb170c3','provider',NULL,'admin'),(4,NULL,'222eda27-958b-4f0c-a5cb-e4114fb170c3','provider',NULL,'96154659-cb3b-4d2d-afef-18d6aec0518e');
+INSERT INTO `role_assignment` VALUES 
+(1,NULL,'8ca60ce9-32f9-42d6-a013-a19b3af0c13d','provider',NULL,'96154659-cb3b-4d2d-afef-18d6aec0518e'),
+(2,'member','8ca60ce9-32f9-42d6-a013-a19b3af0c13d','provider','74f5299e-3247-468c-affb-957cda03f0c4',NULL),
+(3,NULL,'222eda27-958b-4f0c-a5cb-e4114fb170c3','provider',NULL,'admin'),
+(4,NULL,'222eda27-958b-4f0c-a5cb-e4114fb170c3','provider',NULL,'96154659-cb3b-4d2d-afef-18d6aec0518e'),
+(5,NULL,'tutorial-dckr-site-0000-xpresswebapp','provider',NULL,'aaaaaaaa-good-0000-0000-000000000000'),
+(10,NULL,'tutorial-dckr-site-0000-xpresswebapp','security-role-0000-0000-000000000000',NULL,'cccccccc-good-0000-0000-000000000000'),
+(11,'member','tutorial-dckr-site-0000-xpresswebapp','security-role-0000-0000-000000000000','security-team-0000-0000-000000000000',NULL),
+(12,NULL,'tutorial-dckr-site-0000-xpresswebapp','managers-role-0000-0000-000000000000',NULL,'bbbbbbbb-good-0000-0000-000000000000'),
+(13,'member','tutorial-dckr-site-0000-xpresswebapp','managers-role-0000-0000-000000000000','managers-team-0000-0000-000000000000',NULL);
+
 /*!40000 ALTER TABLE `role_assignment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -527,7 +549,7 @@ CREATE TABLE `role_permission` (
   KEY `permission_id` (`permission_id`),
   CONSTRAINT `role_permission_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE,
   CONSTRAINT `role_permission_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permission` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -536,7 +558,13 @@ CREATE TABLE `role_permission` (
 
 LOCK TABLES `role_permission` WRITE;
 /*!40000 ALTER TABLE `role_permission` DISABLE KEYS */;
-INSERT INTO `role_permission` VALUES (1,'provider','1'),(2,'provider','2'),(3,'provider','3'),(4,'provider','4'),(5,'provider','5'),(6,'provider','6'),(7,'purchaser','5');
+INSERT INTO `role_permission` VALUES 
+(1,'provider','1'),(2,'provider','2'),(3,'provider','3'),(4,'provider','4'),(5,'provider','5'),(6,'provider','6'),
+(7,'purchaser','5'),(8,'managers-role-0000-0000-000000000000','buy-item-0000-0000-000000000000');
+
+
+
+
 /*!40000 ALTER TABLE `role_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -703,7 +731,7 @@ CREATE TABLE `user_registration_profile` (
   PRIMARY KEY (`id`),
   KEY `user_email` (`user_email`),
   CONSTRAINT `user_registration_profile_ibfk_1` FOREIGN KEY (`user_email`) REFERENCES `user` (`email`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -725,4 +753,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-07-31  9:11:48
+-- Dump completed on 2018-08-10  9:03:58

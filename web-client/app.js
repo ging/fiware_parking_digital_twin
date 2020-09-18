@@ -7,6 +7,10 @@ const bodyParser = require("body-parser");
 const indexRouter = require("./routes/index");
 const crypto = require("crypto");
 const session = require("express-session");
+const debug = require("debug")("tutorial:*");
+const flash = require("connect-flash");
+
+debug("Debug tutorial");
 const SECRET =
   process.env.SESSION_SECRET || crypto.randomBytes(20).toString("hex");
 
@@ -35,6 +39,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: "application/*+json" }));
+app.use(flash());
 
 app.use(function(req, res, next) {
   res.locals.session = req.session;
