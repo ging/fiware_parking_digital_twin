@@ -413,6 +413,7 @@ CREATE TABLE `pep_proxy` (
 
 LOCK TABLES `pep_proxy` WRITE;
 /*!40000 ALTER TABLE `pep_proxy` DISABLE KEYS */;
+INSERT INTO `pep_proxy` VALUES ('pep_proxy_00000000-0000-0000-0000-000000000000','e9f7c64ec2895eec281f8fd36e588d1bc762bcca',NULL,'tutorial-dckr-site-0000-xpresswebapp');
 /*!40000 ALTER TABLE `pep_proxy` ENABLE KEYS */;
 UNLOCK TABLES;
 

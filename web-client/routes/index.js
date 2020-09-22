@@ -8,7 +8,15 @@ const Security = require("../controllers/security");
 router.all("*", Security.refreshToken);
 
 //----- HANDLE REQUEST TO THE MAIN PAGE -----//
-router.get("/", Store.displayStores);
+router.get("/", (req, res) => {
+  res.render("index", {
+    title: "Prueba Stores",
+    success: req.flash("success"),
+    errors: req.flash("error"),
+    info: req.flash("info")
+  });
+});
+router.get("/app/store", Security.authenticate, Store.displayStores);
 
 //----- LOGS USERS USING KEYROCK -----//
 // Link to authenticate

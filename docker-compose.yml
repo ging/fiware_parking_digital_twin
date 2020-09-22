@@ -1,19 +1,19 @@
 # WARNING: Do not deploy this tutorial configuration directly to a production environment
 #
-# The tutorial docker-compose files have not been written for production deployment and will not 
-# scale. A proper architecture has been sacrificed to keep the narrative focused on the learning 
-# goals, they are just used to deploy everything onto a single Docker machine. All FIWARE components 
-# are running at full debug and extra ports have been exposed to allow for direct calls to services. 
+# The tutorial docker-compose files have not been written for production deployment and will not
+# scale. A proper architecture has been sacrificed to keep the narrative focused on the learning
+# goals, they are just used to deploy everything onto a single Docker machine. All FIWARE components
+# are running at full debug and extra ports have been exposed to allow for direct calls to services.
 # They also contain various obvious security flaws - passwords in plain text, no load balancing,
-# no use of HTTPS and so on. 
-# 
+# no use of HTTPS and so on.
+#
 # This is all to avoid the need of multiple machines, generating certificates, encrypting secrets
-# and so on, purely so that a single docker-compose file can be read as an example to build on, 
-# not use directly. 
-# 
+# and so on, purely so that a single docker-compose file can be read as an example to build on,
+# not use directly.
+#
 # When deploying to a production environment, please looking at the SmartSDK Recipes
 # in order to scale up to a proper architecture:
-# 
+#
 # see: https://smartsdk.github.io/smartsdk-recipes/
 #
 # en producción debería de tener en cuenta de que debe haber cargado mongo-db antes que orion.
@@ -35,7 +35,7 @@ services:
       test: curl --fail -s http://orion:${ORION_PORT}/version || exit 1
 
   # Databases
-    # For orion
+  # For orion
   mongo-db:
     restart: always
     image: mongo:${MONGO_DB_VERSION}
@@ -57,18 +57,18 @@ services:
     hostname: mysql-db
     container_name: db-mysql-tutorial
     expose:
-        - "${MYSQL_DB_PORT}"
+      - "${MYSQL_DB_PORT}"
     ports:
-        - "${MYSQL_DB_PORT}:${MYSQL_DB_PORT}"
+      - "${MYSQL_DB_PORT}:${MYSQL_DB_PORT}"
     networks:
       fiware:
         ipv4_address: 172.18.1.6
     environment:
-        - "MYSQL_ROOT_PASSWORD=${IDM_DB_PASS}"
-        - "MYSQL_ROOT_HOST=172.18.1.5" # allow connections from this ip
+      - "MYSQL_ROOT_PASSWORD=${IDM_DB_PASS}"
+      - "MYSQL_ROOT_HOST=172.18.1.5" # allow connections from this ip
     volumes:
-        - mysql-db-tutorial:/var/lib/mysql
-        - ./mysql-data:/docker-entrypoint-initdb.d/:ro # Preload Keyrock Roles
+      - mysql-db-tutorial:/var/lib/mysql
+      - ./mysql-data:/docker-entrypoint-initdb.d/:ro # Preload Keyrock Roles
   # Web Client
   # web-client:
   #   build:
@@ -77,7 +77,7 @@ services:
   #   container_name: web-client-tutorial
   #   depends_on:
   #     - orion
-  #   expose: 
+  #   expose:
   #     - "${WEB_CLIENT_PORT}"
   #   ports:
   #     - "${WEB_CLIENT_PORT}:${WEB_CLIENT_PORT}"
@@ -95,7 +95,7 @@ services:
     container_name: fiware-keyrock-tutorial
     hostname: keyrock
     depends_on:
-        - mysql-db
+      - mysql-db
     ports:
       - "${KEYROCK_PORT}:${KEYROCK_PORT}" # HTTP
       - "${KEYROCK_HTTPS_PORT}:${KEYROCK_HTTPS_PORT}" # HTTPS
@@ -103,20 +103,53 @@ services:
       fiware:
         ipv4_address: 172.18.1.5
     environment:
-        - "DEBUG=idm:*"
-        - "IDM_DB_HOST=mysql-db"
-        - "IDM_DB_PASS=${IDM_DB_PASS}"
-        - "IDM_DB_USER=root"
-        - "IDM_HOST=${IDM_HOST}:${KEYROCK_PORT}"
-        - "IDM_PORT=${KEYROCK_PORT}"
-        - "IDM_HTTPS_ENABLED=${IDM_HTTPS_ENABLED}"
-        - "IDM_HTTPS_PORT=${KEYROCK_HTTPS_PORT}"
-        - "IDM_ADMIN_USER=${IDM_ADMIN_USER}"
-        - "IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}"
-        - "IDM_ADMIN_PASS=${IDM_ADMIN_PASS}"
+      - "DEBUG=idm:*"
+      - "IDM_DB_HOST=mysql-db"
+      - "IDM_DB_PASS=${IDM_DB_PASS}"
+      - "IDM_DB_USER=root"
+      - "IDM_HOST=${IDM_HOST}:${KEYROCK_PORT}"
+      - "IDM_PORT=${KEYROCK_PORT}"
+      - "IDM_HTTPS_ENABLED=${IDM_HTTPS_ENABLED}"
+      - "IDM_HTTPS_PORT=${KEYROCK_HTTPS_PORT}"
+      - "IDM_ADMIN_USER=${IDM_ADMIN_USER}"
+      - "IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}"
+      - "IDM_ADMIN_PASS=${IDM_ADMIN_PASS}"
     healthcheck:
       test: curl --fail -s http://keyrock:${KEYROCK_PORT}/version || exit 1
-    
+  # pep proxiex
+  orion-proxy:
+    image: fiware/pep-proxy:${WILMA_VERSION}
+    container_name: fiware-orion-proxy-tutorial
+    hostname: orion-proxy
+    networks:
+      fiware:
+        ipv4_address: 172.18.1.10
+    depends_on:
+      - keyrock
+    deploy:
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "${ORION_PROXY_PORT}:${ORION_PROXY_PORT}" # localhost:1027
+    expose:
+      - "${ORION_PROXY_PORT}"
+    environment:
+      - PEP_PROXY_APP_HOST=orion
+      - PEP_PROXY_APP_PORT=${ORION_PORT}
+      - PEP_PROXY_PORT=${ORION_PROXY_PORT}
+      - PEP_PROXY_IDM_HOST=keyrock
+      - PEP_PROXY_HTTPS_ENABLED=false
+      - PEP_PROXY_AUTH_ENABLED=false #basic authorization idm + auth enabled
+      - PEP_PROXY_IDM_SSL_ENABLED=false
+      - PEP_PROXY_IDM_PORT=${KEYROCK_PORT}
+      - PEP_PROXY_APP_ID=tutorial-dckr-site-0000-xpresswebapp
+      - PEP_PROXY_USERNAME=pep_proxy_00000000-0000-0000-0000-000000000000
+      - PEP_PASSWORD=test
+      - PEP_PROXY_PDP=idm
+      - PEP_PROXY_MAGIC_KEY=1234
+    healthcheck:
+      test: curl --fail -s http://orion-proxy:${ORION_PROXY_PORT}/version || exit 1
+
 networks:
   fiware:
     ipam:

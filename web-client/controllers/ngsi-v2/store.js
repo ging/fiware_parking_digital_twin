@@ -4,21 +4,12 @@
 // necessary HTTP calls and responds with success or failure.
 //
 
-// Initialization - first require the NGSI v2 npm library and set
-// the client instance
-const NgsiV2 = require("ngsi_v2");
-const defaultClient = NgsiV2.ApiClient.instance;
 const debug = require("debug")("tutorial:ngsi-v2");
 const axios = require("axios");
-const CB_URL = process.env.CONTEXT_BROKER || "http://localhost:1026/v2";
+const CB_URL = process.env.CONTEXT_BROKER || "http://localhost:1027/v2";
+const Security = require("../security");
 
 debug("Store is retrieved using NGSI-v2");
-
-// The basePath must be set - this is the location of the Orion
-// context broker. It is best to do this with an environment
-// variable (with a fallback if necessary)
-defaultClient.basePath =
-  process.env.CONTEXT_BROKER || "http://localhost:1026/v2";
 
 // This function receives the details of all stores
 //
@@ -29,27 +20,36 @@ defaultClient.basePath =
 
 async function displayStores(req, res, next) {
   debug("listStores");
-  const options = {
-    method: "GET",
-    url: `${CB_URL}/entities`,
-    params: {
-      type: "Store",
-      options: "keyValues"
+  if (!res.locals.authorized) {
+    req.flash("error", "Access Denied");
+    res.redirect("/");
+  } else {
+    const headers = Security.setAuthHeaders(req);
+    const options = {
+      method: "GET",
+      url: `${CB_URL}/entities`,
+      params: {
+        type: "Store",
+        options: "keyValues"
+      },
+      //headers to pep proxy
+      headers
+    };
+    try {
+      const response = await axios(options);
+      const stores = response.data;
+      res.render("stores", {
+        title: "Prueba Stores",
+        stores,
+        success: req.flash("success"),
+        errors: req.flash("error"),
+        info: req.flash("info")
+      });
+    } catch (error) {
+      debug("displaStores error");
+      console.error(error);
+      next(error);
     }
-  };
-  try {
-    const response = await axios(options);
-    const stores = response.data;
-    res.render("index", {
-      title: "Prueba Stores",
-      stores,
-      success: req.flash("success"),
-      errors: req.flash("error"),
-      info: req.flash("info")
-    });
-  } catch (error) {
-    debug("displaStores error", error);
-    next(error);
   }
 }
 
@@ -68,6 +68,7 @@ async function displayTillInfo(req, res, next) {
     req.flash("error", "Access Denied");
     res.redirect("/");
   } else {
+    const headers = Security.setAuthHeaders(req);
     const options = [
       {
         method: "GET",
@@ -75,7 +76,9 @@ async function displayTillInfo(req, res, next) {
         params: {
           type: "Product",
           options: "keyValues"
-        }
+        },
+        //headers to pep proxy
+        headers
       },
       {
         method: "GET",
@@ -84,7 +87,9 @@ async function displayTillInfo(req, res, next) {
           options: "keyValues",
           type: "InventoryItem",
           q: "refStore==" + req.params.storeId
-        }
+        },
+        //headers to pep proxy
+        headers
       }
     ];
     try {
@@ -98,7 +103,8 @@ async function displayTillInfo(req, res, next) {
         storeId: req.params.storeId
       });
     } catch (error) {
-      debug("displaStores error", error);
+      debug("displaStores error");
+      console.error(error);
       next(error);
     }
   }
@@ -125,6 +131,7 @@ async function buyItem(req, res, next) {
     req.flash("error", "Access Denied");
     res.redirect("/");
   } else {
+    const headers = Security.setAuthHeaders(req);
     const options = [
       {
         method: "GET",
@@ -132,25 +139,28 @@ async function buyItem(req, res, next) {
         params: {
           type: "InventoryItem",
           options: "keyValues"
-        }
+        },
+        //headers to pep proxy
+        headers
       }
     ];
     try {
       const inventoryItemResponse = await axios(options[0]);
       const inventoryItem = inventoryItemResponse.data;
       const count = inventoryItem.shelfCount - 1;
+      const headers = Security.setAuthHeaders(req);
+      headers["Content-Type"] = "application/json";
       options.push({
         method: "PATCH",
         url: `${CB_URL}/entities/${req.params.inventoryId}/attrs`,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers,
         data: JSON.stringify({ shelfCount: { type: "Integer", value: count } })
       });
       await axios(options[1]);
       res.redirect(`/app/store/${inventoryItem.refStore}/till`);
     } catch (error) {
-      debug("buyItem error", error);
+      debug("buyItem error");
+      console.error(error);
       next(error);
     }
   }

@@ -13,6 +13,7 @@
     - Administrating Users
     - Managing Roles and Permissions
     - Securing Access (with authorization code grant type). **Importante: A partir de aquí no va a funcionar el web-tutorial como un contenedor porque hay un problema con el paquete de oauth. Necesitas dos ips para identificar a keyrock, una para comunicarse desde el host y otra desde el contenedor, pero el paquete solo deja una. En producción no habría este problema ya que te conectarías a la ip pública de keyrock o del proxy. Por lo tanto arranca web tutorial en la propia máquina. Otra solución sería probar el network host, pero sólo válido en linux**
+    - Securing microservices with a PEP PROXY (Wilma). Está puesta directamente en la base de datos el pep proxy. En un entorno real no debería hacerse así. Para configurar modo autorizacion hay que usar la env **PEP_PROXY_AUTH_ENABLED**, además si se quiere autorizar hay que incluir todas las rutas, ya que sino no deja. Si no encuentra un permiso no deja. Ejemplo **/v2/entities/**, en el tutorial lo he probado pero ahora no está configurado. Ese /v2/entities lo usas para orion pero tambien lo comprobaría si hay una igual en la app.
 
 
 ### Entities IDM:

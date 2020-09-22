@@ -34,6 +34,16 @@ const authorizationUri = clientAuthorizationGrant.authorizeURL({
 
 // ----- HELPERS ---- //
 
+function setAuthHeaders(req) {
+  const headers = {};
+  if (req.session.access_token) {
+    // If the system has been secured and we have logged in,
+    // add the access token to the request to the PEP Proxy
+    headers["X-Auth-Token"] = req.session.access_token;
+  }
+  return headers;
+}
+
 // Saves token in session
 function saveTokensInSession(req, accessToken) {
   debug("The resulting token: ", { accessToken });
@@ -179,5 +189,6 @@ module.exports = {
   authenticate,
   authorizeBasicPDP,
   logOut,
-  refreshToken
+  refreshToken,
+  setAuthHeaders
 };

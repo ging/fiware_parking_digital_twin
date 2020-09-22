@@ -31,8 +31,14 @@
     </ul>
 <% } %>
 <h2>Lista stores</h2>
-<%if (session.username){ %>
-    <a href='/app/store'>Ver lista de tiendas</a>
-<% } else { %>
-    <p>Debe autenticarse</p>
-<% } %>
+<ul>
+    <% stores.forEach(store => { %>
+        <li>
+            <form method='get' action='/app/store/<%=store.id%>/till'>
+                <%=store.name%>
+                <input type='submit' value='Entrar'>
+            </form>
+        </li>
+    <% }) %>
+</ul>
+
