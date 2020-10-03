@@ -3,6 +3,7 @@
 # es no relacional, al borrar debes borrar tambien las relaicones de la entidad que borras para no ser inconsistente
 # las operaciones del crud verlo en la documentacion, son todas llamadas con curl
 # buscar en la documentacion de ngsi-v2 como hacer un delete en cascada
+
 echo 'Get Version'
 echo '============='
 curl -X GET \
@@ -10,6 +11,29 @@ curl -X GET \
   | json_pp
 
 printf '\n\n'
+
+printf '\n\n'
+echo 'Subscription to get changes in draco'
+# Draco
+curl -iX POST \
+  'http://localhost:1026/v2/subscriptions' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "description": "Notify Draco of all context changes",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://draco:5050/v2/notify"
+    }
+  }
+}'
+
 
 echo 'Creating store entities'
 echo '============='
@@ -343,6 +367,8 @@ curl -iX POST \
     }
   }
 }'
+
+
 
 
   
