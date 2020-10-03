@@ -2,14 +2,14 @@
 
 ## It has the following tutorials:
 
-- Core Context Management:
+- [Core Context Management](https://fiware-tutorials.readthedocs.io/en/latest/getting-started/index.html)::
 	- Getting start
 	- Relationships
 	- Crud operations
 	- Accesing context
 	- Subscriptions
 
-- Identity Management:
+- [Identity Management](https://fiware-tutorials.readthedocs.io/en/latest/identity-management/index.html):
     - Administrating Users
     - Managing Roles and Permissions
     - Securing Access (with authorization code grant type). **Importante: A partir de aquí no va a funcionar el web-tutorial como un contenedor porque hay un problema con el paquete de oauth. Necesitas dos ips para identificar a keyrock, una para comunicarse desde el host y otra desde el contenedor, pero el paquete solo deja una. En producción no habría este problema ya que te conectarías a la ip pública de keyrock o del proxy. Por lo tanto arranca web tutorial en la propia máquina. Otra solución sería probar el network host, pero sólo válido en linux**
