@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minikube-ingress
+  namespace: tfm
+  annotations:
+spec:
+  rules:
+  - host: tfm.test
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 3000
+      - path: /spark
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-master
+            port:
+              number: 8080
+      - path: /jupyter
+        pathType: Prefix
+        backend:
+          service:
+            name: jupyterlab
+            port:
+              number: 80
+      - path: /mongo-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: mongo-express-service
+            port:
+              number: 8081
+      - path: /mongo
+        pathType: Prefix
+        backend:
+          service:
+            name: mongodb-svc
+            port:
+              number: 27017
+      - path: /orion
+        pathType: Prefix
+        backend:
+          service:
+            name: orion
+            port:
+              number: 1026
+      - path: /draco
+        pathType: Prefix
+        backend:
+          service:
+            name: draco
+            port:
+              number: 8080

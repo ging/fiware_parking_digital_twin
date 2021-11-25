@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  namespace: tfm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: fiwareusr/web:1.67
+        imagePullPolicy: Always
+        ports:
+        - name: web
+          containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: tfm
+spec:
+  selector:
+    app: web
+  type: LoadBalancer
+  ports:
+    - name: web
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+      nodePort: 30003
