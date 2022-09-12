@@ -2,7 +2,20 @@
 
 A real-time parking occupancy prediction system for Málaga's public parking facilities, built using FIWARE components, Apache Spark ML, and Kubernetes. This project leverages open data from Málaga City Council to train machine learning models and provide occupancy predictions through a web interface.
 
+If you use or base your work on this project, please cite the following article:
 
+```
+@ARTICLE{9346030,
+  author={Conde, Javier and Munoz-Arcentales, Andrés and Alonso, Álvaro and López-Pernas, Sonsoles and Salvachúa, Joaquín},
+  journal={IEEE Internet Computing},
+  title={Modeling Digital Twin Data and Architecture: A Building Guide With FIWARE as Enabling Technology},
+  year={2022},
+  volume={26},
+  number={3},
+  pages={7-14},
+  keywords={Data models;Computer architecture;Digital twins;Market research;Proposals;Ecosystems;Computer architecture},
+  doi={10.1109/MIC.2021.3056923}
+}
 ```
 
 ## 📑 Table of Contents
