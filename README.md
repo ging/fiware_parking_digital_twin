@@ -4,6 +4,7 @@ A real-time parking occupancy prediction system for Málaga's public parking fac
 
 If you use or base your work on this project, please cite the following article:
 
+
 ```
 @ARTICLE{9346030,
   author={Conde, Javier and Munoz-Arcentales, Andrés and Alonso, Álvaro and López-Pernas, Sonsoles and Salvachúa, Joaquín},
